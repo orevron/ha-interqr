@@ -1,0 +1,47 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Connect to InterQR",
+                "description": "Enter your InterQR account details. A verification code will be sent to your phone via SMS.",
+                "data": {
+                    "server": "Server",
+                    "phone": "Phone number (with country code, e.g. +1234567890)",
+                    "custom_url": "Custom API URL"
+                }
+            },
+            "verify": {
+                "title": "Verify your phone number",
+                "description": "Enter the verification code that was sent to {phone}.",
+                "data": {
+                    "code": "Verification code"
+                }
+            },
+            "reauth_confirm": {
+                "title": "Re-authenticate InterQR",
+                "description": "Your InterQR session has expired. Please re-authenticate.",
+                "data": {
+                    "phone": "Phone number (with country code)",
+                    "server": "Server"
+                }
+            }
+        },
+        "error": {
+            "cannot_connect": "Unable to connect to InterQR server.",
+            "invalid_auth": "Invalid verification code. Please try again.",
+            "twofa_failed": "Failed to start 2FA. Check your phone number.",
+            "init_failed": "Failed to initialize device with InterQR server.",
+            "unknown": "An unexpected error occurred.",
+            "invalid_phone": "Invalid phone number. Use international format (e.g. +1234567890).",
+            "invalid_code": "Invalid code format. Enter a 4-8 digit numeric code.",
+            "https_required": "Custom URL must use HTTPS.",
+            "invalid_url": "Invalid URL format.",
+            "private_url_blocked": "Private/internal network URLs are not allowed."
+        },
+        "abort": {
+            "already_configured": "This InterQR account is already configured.",
+            "reauth_successful": "Re-authentication was successful.",
+            "too_many_attempts": "Too many failed verification attempts. Please start over."
+        }
+    }
+}
