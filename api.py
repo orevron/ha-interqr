@@ -29,11 +29,11 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-# Compiled pattern for UUID v4 validation
-_UUID_PATTERN = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-    re.IGNORECASE,
-)
+# Compiled pattern for lock/device identifier validation.
+# The InterQR API uses identifiers that are NOT necessarily UUID v4
+# (e.g. "abc-123"), so we use a permissive pattern that still
+# prevents path-traversal and injection attacks.
+_SAFE_ID_PATTERN = re.compile(r"^[0-9a-zA-Z\-]+$")
 
 _REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=API_TIMEOUT_SECONDS)
 
@@ -47,12 +47,13 @@ class InterQRConnectionError(Exception):
 
 
 def _validate_uuid(value: str, label: str = "UUID") -> str:
-    """Validate that a string is a well-formed UUID to prevent path injection.
+    """Validate that a string is a safe identifier to prevent path injection.
 
+    Accepts any non-empty string composed of alphanumeric characters and hyphens.
     Raises ValueError if the format is invalid.
     """
-    if not _UUID_PATTERN.match(value):
-        raise ValueError(f"Invalid {label} format: expected UUID v4")
+    if not value or not _SAFE_ID_PATTERN.match(value):
+        raise ValueError(f"Invalid {label} format: expected alphanumeric identifier")
     return value
 
 
