@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/your-repo/ha-interqr/releases"><img alt="Release" src="https://img.shields.io/github/v/release/your-repo/ha-interqr?style=flat-square" /></a>
-  <a href="https://github.com/your-repo/ha-interqr/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/your-repo/ha-interqr?style=flat-square" /></a>
+  <a href="https://github.com/orevron/ha-interqr/releases"><img alt="Release" src="https://img.shields.io/github/v/release/orevron/ha-interqr?style=flat-square" /></a>
+  <a href="https://github.com/orevron/ha-interqr/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/orevron/ha-interqr?style=flat-square" /></a>
   <img alt="HACS" src="https://img.shields.io/badge/HACS-Custom-41BDF5?style=flat-square" />
   <img alt="HA" src="https://img.shields.io/badge/Home%20Assistant-2024.1+-blue?style=flat-square" />
 </p>
@@ -41,7 +41,7 @@ The **InterQR** integration allows you to control [InterQR](https://www.interqr.
 
 ### Manual
 
-1. Download the latest release from the [releases page](https://github.com/your-repo/ha-interqr/releases)
+1. Download the latest release from the [releases page](https://github.com/orevron/ha-interqr/releases)
 2. Copy the `custom_components/interqr` folder into your Home Assistant `config/custom_components/` directory
 3. Restart Home Assistant
 
@@ -252,7 +252,7 @@ sequenceDiagram
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or pull request on the [GitHub repository](https://github.com/your-repo/ha-interqr).
+Contributions are welcome! Please open an issue or pull request on the [GitHub repository](https://github.com/orevron/ha-interqr).
 
 ## License
 
