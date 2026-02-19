@@ -7,13 +7,14 @@ from typing import Any
 
 from homeassistant.components.lock import LockEntity, LockEntityFeature
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import InterQRApiClient
-from .const import DOMAIN
+from .const import DOMAIN, RELOCK_DELAY
 from .coordinator import InterQRDataCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -56,6 +57,7 @@ class InterQRLock(CoordinatorEntity[InterQRDataCoordinator], LockEntity):
         """Initialize the lock entity."""
         super().__init__(coordinator)
         self._api = api
+        self._cancel_relock: CALLBACK_TYPE | None = None
         self._lock_uuid: str = lock_data["lock_uuid"]
         self._lock_data = lock_data
 
@@ -117,6 +119,28 @@ class InterQRLock(CoordinatorEntity[InterQRDataCoordinator], LockEntity):
                 break
         self.async_write_ha_state()
 
+    # ── Auto-relock helper ────────────────────────────────────────────
+
+    @callback
+    def _async_relock(self, _now: Any) -> None:
+        """Return the lock to 'locked' state after the relock delay."""
+        self._cancel_relock = None
+        self._attr_is_locked = True
+        self.async_write_ha_state()
+        _LOGGER.debug("Auto-relocked: %s", self._attr_name)
+
+    @callback
+    def _schedule_auto_relock(self) -> None:
+        """Schedule the lock to return to 'locked' after RELOCK_DELAY."""
+        # Cancel any pending relock so we don't stack timers
+        if self._cancel_relock is not None:
+            self._cancel_relock()
+        self._cancel_relock = async_call_later(
+            self.hass, RELOCK_DELAY, self._async_relock
+        )
+
+    # ── Lock / Unlock actions ────────────────────────────────────────
+
     async def async_unlock(self, **kwargs: Any) -> None:
         """Unlock the lock (normal unlock)."""
         _LOGGER.info("Unlocking InterQR lock: %s", self._attr_name)
@@ -126,11 +150,18 @@ class InterQRLock(CoordinatorEntity[InterQRDataCoordinator], LockEntity):
         try:
             await self._api.unlock(self._lock_uuid)
             _LOGGER.info("Successfully unlocked: %s", self._attr_name)
+            # Transition to unlocked so HomeKit sees the state change
+            self._attr_is_locked = False
+        except Exception:
+            # On failure, stay locked
+            self._attr_is_locked = True
+            raise
         finally:
             self._attr_is_unlocking = False
-            # Lock returns to locked state (unlock-only system)
-            self._attr_is_locked = True
             self.async_write_ha_state()
+
+        # Auto-relock after delay (unlock-only system)
+        self._schedule_auto_relock()
 
     async def async_open(self, **kwargs: Any) -> None:
         """Long unlock the lock (extended duration)."""
@@ -147,13 +178,28 @@ class InterQRLock(CoordinatorEntity[InterQRDataCoordinator], LockEntity):
         try:
             await self._api.unlock_long(self._lock_uuid)
             _LOGGER.info("Successfully long-unlocked: %s", self._attr_name)
+            self._attr_is_locked = False
+        except Exception:
+            self._attr_is_locked = True
+            raise
         finally:
             self._attr_is_unlocking = False
-            self._attr_is_locked = True
             self.async_write_ha_state()
 
+        self._schedule_auto_relock()
+
     async def async_lock(self, **kwargs: Any) -> None:
-        """Lock is not supported — the InterQR API is unlock-only."""
+        """Confirm locked state (InterQR is unlock-only).
+
+        The API does not support a lock command, but we confirm
+        the locked state so that HomeKit gets proper feedback.
+        """
         _LOGGER.debug(
-            "Lock action is not supported by InterQR (unlock-only system)"
+            "Lock command received (unlock-only system, confirming locked)"
         )
+        # Cancel any pending auto-relock since we are locking immediately
+        if self._cancel_relock is not None:
+            self._cancel_relock()
+            self._cancel_relock = None
+        self._attr_is_locked = True
+        self.async_write_ha_state()

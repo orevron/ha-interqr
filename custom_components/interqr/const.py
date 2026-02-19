@@ -42,6 +42,9 @@ SERVER_URLS = {
 # ── Coordinator ──────────────────────────────────────────────────────
 DEFAULT_SCAN_INTERVAL = 300  # seconds (5 minutes)
 
+# ── Lock Behaviour ───────────────────────────────────────────────────
+RELOCK_DELAY = 5  # seconds – time the lock stays "unlocked" before auto-relocking
+
 # ── Security ─────────────────────────────────────────────────────
 API_TIMEOUT_SECONDS = 30
 MAX_RESPONSE_BYTES = 1_048_576  # 1 MB

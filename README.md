@@ -21,6 +21,7 @@ The **InterQR** integration allows you to control [InterQR](https://www.interqr.
 - 🔐 **Secure 2FA Setup** — SMS-based two-factor authentication during configuration
 - 🔑 **Automatic Re-authentication** — Seamlessly refreshes expired tokens; falls back to full 2FA when needed
 - 🏠 **Multi-Lock Support** — Discovers and creates entities for all locks on your account
+- 🍎 **Apple HomeKit Compatible** — Works with the HomeKit Bridge integration (accessory mode) for Siri and Apple Home control
 - 🛡️ **Security Hardened** — HTTPS enforcement, input validation, SSRF prevention, rate limiting, and sanitized logging
 
 ## Prerequisites
@@ -96,12 +97,13 @@ The integration creates a **Lock** entity for each lock associated with your Int
 
 | Attribute | Description |
 |---|---|
-| **State** | Always `locked` (InterQR is an unlock-only system) |
+| **State** | `locked` by default; transitions to `unlocked` on success, then auto-relocks after 5 seconds |
 | **Unlock** | Sends a standard unlock command to the lock |
 | **Open** | Sends a long-duration unlock command (only for supported locks) |
+| **Lock** | Confirms locked state (no API call — InterQR is unlock-only) |
 
 > [!IMPORTANT]
-> InterQR locks are **unlock-only** — there is no "lock" command. The lock state will always return to `locked` after an unlock action completes.
+> InterQR locks are **unlock-only** — there is no physical "lock" command. After unlocking, the lock state transitions to `unlocked` for 5 seconds to provide feedback (e.g., to HomeKit), then automatically returns to `locked`.
 
 ### State Attributes
 
@@ -157,6 +159,25 @@ automation:
           entity_id: input_boolean.expecting_delivery
 ```
 
+## Apple HomeKit
+
+This integration is fully compatible with the Home Assistant [HomeKit Bridge](https://www.home-assistant.io/integrations/homekit/) integration, allowing you to control your InterQR locks from Apple Home and Siri.
+
+> [!IMPORTANT]
+> Apple HomeKit requires locks to be exposed in **Accessory mode**, not Bridge mode. This is an Apple security requirement for devices that control physical home access.
+
+### Setup
+
+1. Go to **Settings** → **Devices & Services** → **Add Integration** → **Apple Home**
+2. Select **"Accessory"** mode
+3. In the entity filter, include **only one lock entity** (e.g., `lock.interqr_front_door`)
+4. Complete setup — a QR code / pairing PIN will be generated
+5. In the **Apple Home** app, tap **Add Accessory** → scan the QR code or enter the PIN
+6. Confirm adding the "Uncertified Accessory"
+
+> [!NOTE]
+> If you have **multiple locks**, create a **separate accessory mode instance for each lock** — each instance can only expose a single lock to HomeKit.
+
 ## Services
 
 This integration uses the standard Home Assistant lock services:
@@ -165,7 +186,7 @@ This integration uses the standard Home Assistant lock services:
 |---|---|
 | `lock.unlock` | Send unlock command to the lock |
 | `lock.open` | Send long-duration unlock (if supported by the lock) |
-| `lock.lock` | *Not supported* — InterQR is unlock-only |
+| `lock.lock` | Confirms locked state (no API call — useful for HomeKit feedback) |
 
 ## Security
 
