@@ -168,12 +168,13 @@ This integration is fully compatible with the Home Assistant [HomeKit Bridge](ht
 
 ### Setup
 
-1. Go to **Settings** → **Devices & Services** → **Add Integration** → **Apple Home**
-2. Select **"Accessory"** mode
-3. In the entity filter, include **only one lock entity** (e.g., `lock.interqr_front_door`)
-4. Complete setup — a QR code / pairing PIN will be generated
-5. In the **Apple Home** app, tap **Add Accessory** → scan the QR code or enter the PIN
-6. Confirm adding the "Uncertified Accessory"
+1. Go to **Settings** → **Devices & Services** → **Add Integration**
+2. Search for and add the **HomeKit Bridge** integration
+3. Set **Domains to include** to **lock**
+4. Select **Accessory** mode
+5. In the **Apple Home** app, tap **Add Accessory** and choose the lock
+6. Accept the **Uncertified Accessory** prompt
+7. From the **Home Assistant Notifications** panel, take a photo of the QR code to pair the device
 
 > [!NOTE]
 > If you have **multiple locks**, create a **separate accessory mode instance for each lock** — each instance can only expose a single lock to HomeKit.
