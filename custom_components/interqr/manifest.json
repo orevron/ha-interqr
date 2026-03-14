@@ -1,13 +1,14 @@
 {
   "domain": "interqr",
   "name": "InterQR",
-  "codeowners": ["@orevron"],
+  "codeowners": [
+    "@orevron"
+  ],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/orevron/ha-interqr",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/orevron/ha-interqr/issues",
   "requirements": [],
-  "version": "1.0.7"
+  "version": "1.0.8"
 }
-
