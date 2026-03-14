@@ -1,4 +1,6 @@
 {
     "name": "InterQR",
-    "render_readme": true
+    "render_readme": true,
+    "country": "IL"
 }
+
