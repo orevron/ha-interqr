@@ -1,7 +1,7 @@
 {
   "domain": "interqr",
   "name": "InterQR",
-  "codeowners": [],
+  "codeowners": ["@orevron"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/orevron/ha-interqr",
