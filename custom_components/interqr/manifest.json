@@ -3,6 +3,7 @@
   "name": "InterQR",
   "codeowners": ["@orevron"],
   "config_flow": true,
+  "issue_tracker": "https://github.com/orevron/ha-interqr/issues",
   "dependencies": [],
   "documentation": "https://github.com/orevron/ha-interqr",
   "iot_class": "cloud_polling",

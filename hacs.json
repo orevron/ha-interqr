@@ -1,6 +1,6 @@
 {
     "name": "InterQR",
     "render_readme": true,
-    "codeowners": ["@orevron"],
     "country": "IL"
 }
+
